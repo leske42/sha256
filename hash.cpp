@@ -6,12 +6,13 @@
 /*   By: mhuszar <mhuszar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:10:36 by mhuszar           #+#    #+#             */
-/*   Updated: 2025/01/04 21:05:02 by mhuszar          ###   ########.fr       */
+/*   Updated: 2025/01/04 22:03:43 by mhuszar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <cstddef>
 #include <cstdint>
+#include <endian.h>
 #include <iostream>
 #include <vector>
 #include <unistd.h>
@@ -85,12 +86,10 @@ void create_padding(std::vector<unsigned char>& data)
     
     size_t *proxy_ptr = &L;
     unsigned char *ptr = (unsigned char *)proxy_ptr;
-    for (int i = 0; i < 8; i++)
+    for (int i = 7; i >= 0; i--)
     {
-        data.push_back(*ptr);
-        // std::cout << "pushing back " << (char)(*ptr + 48) << std::endl;
-        //FUCK ENDIANNESS!!
-        ptr++;
+        data.push_back(*(ptr + i));
+        // std::cout << "pushing back " << (char)(*(ptr + i) + 48) << std::endl;
     }
 }
 
@@ -141,7 +140,7 @@ void process(std::vector<unsigned char>& data)
     {
         for (int i = 0; i < 16; i++)
         {
-            w[i] = *raw_mod;
+            w[i] = __bswap_constant_32(*raw_mod);
             // std::cout << "index " << i << " is: " << w[i] << std::endl;
             raw_mod += 1;
         }
@@ -151,24 +150,39 @@ void process(std::vector<unsigned char>& data)
     }
 }
 
-// void display_hash()
-// {
-//     std::stringstream output;
-//     uint8_t *ptr = (uint8_t *)h;
-//     for (int i = 0; i < 32; i++)
-//     {
-//         // std::cout << *(ptr + i) << std::endl;
-//         output << std::hex << (uint32_t)*(ptr + i);
-//     }
-//     std::cout << output.str() << std::endl;
-// }
+std::string hexnum(uint32_t num)
+{
+    std::stringstream res;
+    uint32_t part = (num >> 24) & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    part = (num >> 16) & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    part = (num >> 8) & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    part = num & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    // std::cout << "partial result: " << res.str() << std::endl;
+    return (res.str());
+}
 
 void display_hash()
 {
     std::ostringstream output;
     for (int i = 0; i < 8; ++i)
     {
-        output << std::hex << h[i];
+        output << hexnum(h[i]);
     }
     std::cout << output.str() << std::endl;
 }
@@ -186,4 +200,5 @@ int main(int argc, char **argv)
     process(data);
     extend_w();
     display_hash();
+    // std::cout << hexnum(42) << std::endl;
 }
