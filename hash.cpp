@@ -6,7 +6,7 @@
 /*   By: mhuszar <mhuszar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:10:36 by mhuszar           #+#    #+#             */
-/*   Updated: 2025/01/05 19:12:05 by mhuszar          ###   ########.fr       */
+/*   Updated: 2025/01/05 21:02:47 by mhuszar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ uint32_t k[64] = {0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x
 uint32_t w[64];
    
 
-uint32_t __attribute__ ((always_inline)) rotate_right(uint32_t num, uint8_t val)
+static inline  uint32_t __attribute__ ((always_inline)) rotate_right(uint32_t num, uint8_t val)
 {
     __asm__ (
         "rorl %1, %%eax;"
@@ -53,22 +53,22 @@ uint32_t __attribute__ ((always_inline)) rotate_right(uint32_t num, uint8_t val)
     return (num);
 }
 
-uint32_t __attribute__ ((always_inline)) sigma0 (uint32_t word)
+static inline uint32_t __attribute__ ((always_inline)) sigma0 (uint32_t word)
 {
     return (rotate_right(word, 7) ^ rotate_right(word, 18) ^ (word >> 3));
 }
 
-uint32_t __attribute__ ((always_inline)) sigma1 (uint32_t word)
+static inline uint32_t __attribute__ ((always_inline)) sigma1 (uint32_t word)
 {
     return (rotate_right(word, 17) ^ rotate_right(word, 19) ^ (word >> 10));
 }
 
-uint32_t __attribute__ ((always_inline)) SIGMA0 (uint32_t word)
+static inline uint32_t __attribute__ ((always_inline)) SIGMA0 (uint32_t word)
 {
     return (rotate_right(word, 2) ^ rotate_right(word, 13) ^ rotate_right(word, 22));
 }
 
-uint32_t __attribute__ ((always_inline)) SIGMA1 (uint32_t word)
+static inline uint32_t __attribute__ ((always_inline)) SIGMA1 (uint32_t word)
 {
     return (rotate_right(word, 6) ^ rotate_right(word, 11) ^ rotate_right(word, 25));
 }
@@ -96,11 +96,10 @@ void add_chunks()
 
 void create_padding(std::vector<unsigned char>& data)
 {
-    size_t L = data.size();
-    size_t K = 512 - (((L << 3) + 1 + 64) & 511);
+    size_t L = data.size() << 3;
+    size_t K = 512 - ((L + 1 + 64) & 511);
     size_t octets = (K + 1) >> 3;
-    
-    // std::cout << "K + 1 is: " << K + 1 << " which in octets is: " << octets << std::endl;
+
     data.push_back(128);
     while (--octets)
         data.push_back(0);
@@ -110,7 +109,6 @@ void create_padding(std::vector<unsigned char>& data)
     for (int i = 7; i >= 0; i--)
     {
         data.push_back(*(ptr + i));
-        // std::cout << "pushing back " << (char)(*(ptr + i) + 48) << std::endl;
     }
 }
 
@@ -208,7 +206,6 @@ int main(int argc, char **argv)
     std::vector<unsigned char> data(input.begin(), input.end());
     
     create_padding(data);
-    // std::cout << "final size: " << data.size() * 8 << std::endl;
     process(data);
     display_hash();
 }
