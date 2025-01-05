@@ -33,6 +33,7 @@ $(TEST_NAME): $(OBJ) testing.o $(HEADER)
 	$(CXX) $(CXXFLAGS) $(OBJ) testing.o -g -o $(TEST_NAME)
 
 test:
+	@$(MAKE) fclean > /dev/null
 	@$(MAKE) $(TEST_NAME) CXXFLAGS="$(CXXFLAGS) -DTEST_MODE=1" > /dev/null
 	@./unit
 	@$(MAKE) fclean > /dev/null
