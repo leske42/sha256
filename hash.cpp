@@ -6,7 +6,7 @@
 /*   By: mhuszar <mhuszar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:10:36 by mhuszar           #+#    #+#             */
-/*   Updated: 2025/01/05 21:47:45 by mhuszar          ###   ########.fr       */
+/*   Updated: 2025/01/05 22:00:41 by mhuszar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ uint32_t k[64] = {0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x
 
 uint32_t w[64];
    
-
 static inline  uint32_t __attribute__ ((always_inline)) rotate_right(uint32_t num, uint8_t val)
 {
     __asm__ (
@@ -53,6 +52,33 @@ static inline  uint32_t __attribute__ ((always_inline)) rotate_right(uint32_t nu
     return (num);
 }
 
+static inline std::string __attribute__ ((always_inline)) hexnum(uint32_t num)
+{
+    std::stringstream res;
+    uint32_t part = (num >> 24) & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    part = (num >> 16) & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    part = (num >> 8) & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    part = num & 255;
+    if (part < 16)
+        res << "0";
+    res << std::hex << part;
+
+    return (res.str());
+}
+
+#ifndef TEST_MODE
 static inline uint32_t __attribute__ ((always_inline)) sigma0 (uint32_t word)
 {
     return (rotate_right(word, 7) ^ rotate_right(word, 18) ^ (word >> 3));
@@ -161,32 +187,6 @@ static inline void __attribute__ ((always_inline)) process(std::vector<unsigned 
     }
 }
 
-static inline std::string __attribute__ ((always_inline)) hexnum(uint32_t num)
-{
-    std::stringstream res;
-    uint32_t part = (num >> 24) & 255;
-    if (part < 16)
-        res << "0";
-    res << std::hex << part;
-
-    part = (num >> 16) & 255;
-    if (part < 16)
-        res << "0";
-    res << std::hex << part;
-
-    part = (num >> 8) & 255;
-    if (part < 16)
-        res << "0";
-    res << std::hex << part;
-
-    part = num & 255;
-    if (part < 16)
-        res << "0";
-    res << std::hex << part;
-
-    return (res.str());
-}
-
 static inline void __attribute__ ((always_inline)) display_hash()
 {
     std::ostringstream output;
@@ -197,7 +197,6 @@ static inline void __attribute__ ((always_inline)) display_hash()
     std::cout << output.str() << std::endl;
 }
 
-#ifndef TEST_MODE
 int main(void)
 {
     std::vector<unsigned char> data;
@@ -215,6 +214,7 @@ int main(void)
 int main(void)
 {
     assert_eq(rotate_right(42, 2), 2147483658);
+    // std::cout << "done" << std::endl;
     assert_eq(hexnum(42), "0000002a");
     display_result();
 }

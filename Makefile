@@ -29,8 +29,8 @@ $(NAME): $(OBJ) $(HEADER)
 	$(CXX) $(CXXFLAGS) $(OBJ) -g -o $(NAME)
 	@echo "$(GREEN)Executable $(NAME) created!$(DEF_COLOR)"
 
-$(TEST_NAME): $(OBJ) test.o $(HEADER)
-	$(CXX) $(CXXFLAGS) $(OBJ) test.o -g -o $(TEST_NAME)
+$(TEST_NAME): $(OBJ) testing.o $(HEADER)
+	$(CXX) $(CXXFLAGS) $(OBJ) testing.o -g -o $(TEST_NAME)
 
 test:
 	@$(MAKE) $(TEST_NAME) CXXFLAGS="$(CXXFLAGS) -DTEST_MODE=1" > /dev/null
@@ -38,7 +38,7 @@ test:
 	@$(MAKE) fclean > /dev/null
 
 clean:
-	rm -f $(OBJ) test.o
+	rm -f $(OBJ) testing.o
 
 fclean: clean
 	rm -f $(NAME) $(TEST_NAME)
