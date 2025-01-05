@@ -6,7 +6,7 @@
 /*   By: mhuszar <mhuszar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:10:36 by mhuszar           #+#    #+#             */
-/*   Updated: 2025/01/05 21:02:47 by mhuszar          ###   ########.fr       */
+/*   Updated: 2025/01/05 21:08:35 by mhuszar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ static inline uint32_t __attribute__ ((always_inline)) SIGMA1 (uint32_t word)
     return (rotate_right(word, 6) ^ rotate_right(word, 11) ^ rotate_right(word, 25));
 }
 
-void add_chunks()
+static inline void __attribute__ ((always_inline)) add_chunks()
 {
     h[0] += a;
     h[1] += b;
@@ -94,7 +94,7 @@ void add_chunks()
     _h = h[7];
 }
 
-void create_padding(std::vector<unsigned char>& data)
+static inline void __attribute__ ((always_inline)) create_padding(std::vector<unsigned char>& data)
 {
     size_t L = data.size() << 3;
     size_t K = 512 - ((L + 1 + 64) & 511);
@@ -112,7 +112,7 @@ void create_padding(std::vector<unsigned char>& data)
     }
 }
 
-void extend_w()
+static inline void __attribute__ ((always_inline)) extend_w()
 {
     for (int t = 16; t < 64; t++)
     {
@@ -120,7 +120,7 @@ void extend_w()
     }
 }
 
-void compress()
+static inline void __attribute__ ((always_inline)) compress()
 {
     uint32_t ch, maj, temp1, temp2;
 
@@ -142,7 +142,7 @@ void compress()
     }
 }
 
-void process(std::vector<unsigned char>& data)
+static inline void __attribute__ ((always_inline)) process(std::vector<unsigned char>& data)
 {
     size_t total = data.size();
     unsigned char *raw = data.data();
@@ -161,7 +161,7 @@ void process(std::vector<unsigned char>& data)
     }
 }
 
-std::string hexnum(uint32_t num)
+static inline std::string __attribute__ ((always_inline)) hexnum(uint32_t num)
 {
     std::stringstream res;
     uint32_t part = (num >> 24) & 255;
@@ -187,7 +187,7 @@ std::string hexnum(uint32_t num)
     return (res.str());
 }
 
-void display_hash()
+static inline void __attribute__ ((always_inline)) display_hash()
 {
     std::ostringstream output;
     for (int i = 0; i < 8; ++i)
