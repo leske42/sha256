@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hash.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mhuszar <mhuszar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mhuszar <mhuszar@student.42vienna.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:10:36 by mhuszar           #+#    #+#             */
-/*   Updated: 2025/01/05 22:00:41 by mhuszar          ###   ########.fr       */
+/*   Updated: 2025/01/05 22:59:05 by mhuszar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,6 @@ int main(void)
 int main(void)
 {
     assert_eq(rotate_right(42, 2), 2147483658);
-    // std::cout << "done" << std::endl;
     assert_eq(hexnum(42), "0000002a");
     display_result();
 }
