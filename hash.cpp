@@ -6,7 +6,7 @@
 /*   By: mhuszar <mhuszar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:10:36 by mhuszar           #+#    #+#             */
-/*   Updated: 2025/01/04 22:03:43 by mhuszar          ###   ########.fr       */
+/*   Updated: 2025/01/05 19:12:05 by mhuszar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <vector>
 #include <unistd.h>
 #include <sstream>
+#include "testing.hpp"
 
 uint32_t h[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
@@ -50,6 +51,26 @@ uint32_t __attribute__ ((always_inline)) rotate_right(uint32_t num, uint8_t val)
       :
     );
     return (num);
+}
+
+uint32_t __attribute__ ((always_inline)) sigma0 (uint32_t word)
+{
+    return (rotate_right(word, 7) ^ rotate_right(word, 18) ^ (word >> 3));
+}
+
+uint32_t __attribute__ ((always_inline)) sigma1 (uint32_t word)
+{
+    return (rotate_right(word, 17) ^ rotate_right(word, 19) ^ (word >> 10));
+}
+
+uint32_t __attribute__ ((always_inline)) SIGMA0 (uint32_t word)
+{
+    return (rotate_right(word, 2) ^ rotate_right(word, 13) ^ rotate_right(word, 22));
+}
+
+uint32_t __attribute__ ((always_inline)) SIGMA1 (uint32_t word)
+{
+    return (rotate_right(word, 6) ^ rotate_right(word, 11) ^ rotate_right(word, 25));
 }
 
 void add_chunks()
@@ -95,29 +116,22 @@ void create_padding(std::vector<unsigned char>& data)
 
 void extend_w()
 {
-    uint32_t s0, s1;
-
-    for (int i = 16; i < 64; i++)
+    for (int t = 16; t < 64; t++)
     {
-        s0 = rotate_right(w[i-15], 7) ^ rotate_right(w[i-15], 18) ^ (w[i-15] >> 3);
-        s1 = rotate_right(w[i-2], 17) ^ rotate_right(w[i-2], 19) ^ (w[i-2] >> 10);
-        w[i] = w[i-16] + s0 + w[i-7] + s1;
-        // std::cout << "index " << i << " is: " << w[i] << std::endl;
+        w[t] = w[t-16] + sigma0(w[t-15]) + w[t-7] + sigma1(w[t-2]);
     }
 }
 
 void compress()
 {
-    uint32_t s0, s1, ch, maj, temp1, temp2;
+    uint32_t ch, maj, temp1, temp2;
 
-    for (int i = 0; i < 64; i++)
+    for (int t = 0; t < 64; t++)
     {
-        s1 = rotate_right(e, 6) ^ rotate_right(e, 11) ^ rotate_right(e, 25);
         ch = (e & f) ^ (~e & g);
-        temp1 = _h + s1 + ch + k[i] + w[i];
-        s0 = rotate_right(a, 2) ^ rotate_right(a, 13) ^ rotate_right(a, 22);
+        temp1 = _h + SIGMA1(e) + ch + k[t] + w[t];
         maj = (a & b) ^ (a & c) ^ (b & c);
-        temp2 = s0 + maj;
+        temp2 = SIGMA0(a) + maj;
 
         _h = g;
         g = f;
@@ -141,7 +155,6 @@ void process(std::vector<unsigned char>& data)
         for (int i = 0; i < 16; i++)
         {
             w[i] = __bswap_constant_32(*raw_mod);
-            // std::cout << "index " << i << " is: " << w[i] << std::endl;
             raw_mod += 1;
         }
         extend_w();
@@ -173,7 +186,6 @@ std::string hexnum(uint32_t num)
         res << "0";
     res << std::hex << part;
 
-    // std::cout << "partial result: " << res.str() << std::endl;
     return (res.str());
 }
 
@@ -187,6 +199,7 @@ void display_hash()
     std::cout << output.str() << std::endl;
 }
 
+#ifndef TEST_MODE
 int main(int argc, char **argv)
 {
     if (argc != 2)
@@ -194,11 +207,16 @@ int main(int argc, char **argv)
     std::string input = argv[1];
     std::vector<unsigned char> data(input.begin(), input.end());
     
-    // std::cout << rotate_right(42, 2) << std::endl;
     create_padding(data);
     // std::cout << "final size: " << data.size() * 8 << std::endl;
     process(data);
-    extend_w();
     display_hash();
-    // std::cout << hexnum(42) << std::endl;
 }
+#else
+int main(void)
+{
+    assert_eq(rotate_right(42, 2), 2147483658);
+    assert_eq(hexnum(42), "0000002a");
+    display_result();
+}
+#endif
