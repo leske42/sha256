@@ -6,7 +6,7 @@
 /*   By: mhuszar <mhuszar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 17:10:36 by mhuszar           #+#    #+#             */
-/*   Updated: 2025/01/05 21:08:35 by mhuszar          ###   ########.fr       */
+/*   Updated: 2025/01/05 21:47:45 by mhuszar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ static inline void __attribute__ ((always_inline)) compress()
 
 static inline void __attribute__ ((always_inline)) process(std::vector<unsigned char>& data)
 {
-    size_t total = data.size();
+    size_t total = data.size() << 3;
     unsigned char *raw = data.data();
     uint32_t *raw_mod = (uint32_t *)raw;
     add_chunks();
