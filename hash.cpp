@@ -198,13 +198,15 @@ static inline void __attribute__ ((always_inline)) display_hash()
 }
 
 #ifndef TEST_MODE
-int main(int argc, char **argv)
+int main(void)
 {
-    if (argc != 2)
-        return 0;
-    std::string input = argv[1];
-    std::vector<unsigned char> data(input.begin(), input.end());
-    
+    std::vector<unsigned char> data;
+    unsigned char buf[2048];
+
+    while (std::cin.read((char*)buf, 2048))
+        data.insert(data.end(), buf, buf + std::cin.gcount());
+    data.insert(data.end(), buf, buf + std::cin.gcount());
+
     create_padding(data);
     process(data);
     display_hash();
