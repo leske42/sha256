@@ -1,6 +1,8 @@
 NAME = tiny_sha
 TEST_NAME = unit
 CXX = c++
+CXX1 = g++
+CXX2 = clang++
 CXXFLAGS = -Wall -Werror -Wextra -Wshadow #-g
 
 #Colors
